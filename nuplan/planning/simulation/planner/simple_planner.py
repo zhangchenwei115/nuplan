@@ -24,7 +24,7 @@ class SimplePlanner(AbstractPlanner):
         sampling_time: float,
         acceleration: npt.NDArray[np.float32],
         max_velocity: float = 5.0,
-        steering_angle: float = 0.0,
+        steering_angle: float = 10.0,
     ):
         """
         Constructor for SimplePlanner.

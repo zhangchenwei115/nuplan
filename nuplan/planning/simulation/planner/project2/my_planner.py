@@ -23,9 +23,11 @@ from nuplan.planning.simulation.trajectory.interpolated_trajectory import Interp
 from nuplan.common.actor_state.state_representation import StateSE2, StateVector2D
 from nuplan.common.actor_state.agent import Agent
 from nuplan.common.actor_state.tracked_objects import TrackedObject, TrackedObjects
+from nuplan.planning.simulation.planner.project2.frame_transform import cartesian2frenet
+
+import cvxpy as cp
 
 logger = logging.getLogger(__name__)
-
 
 class MyPlanner(AbstractPlanner):
     """
@@ -100,6 +102,15 @@ class MyPlanner(AbstractPlanner):
                  horizon_time: TimePoint,
                  sampling_time: TimePoint,
                  max_velocity: float) -> List[EgoState]:
+        #prepare the ego state for qp planner
+        start_s, start_l, start_s_dot, start_l_dot, start_dl, start_l_dot2, start_s_dot2, start_ddl= self.generate_ego_state(ego_state,reference_path_provider)
+        
+        #generate the constraints for qp planner
+        l_max,l_min = self.generate_convex_space(reference_path_provider)
+        
+        #qp planner
+        qp_path_s, qp_path_l, qp_path_dl, qp_path_ddl = self.path_planning_QP(
+            start_s, start_l, start_s_dot, start_l_dot, start_dl, start_l_dot2, start_s_dot2, start_ddl, l_min, l_max)
         """
         Implement trajectory planning based on input and output, recommend using lattice planner or piecewise jerk planner.
         param: ego_state Initial state of the ego vehicle
@@ -177,3 +188,24 @@ class MyPlanner(AbstractPlanner):
 
         trajectory = []
         return trajectory
+    
+    def generate_ego_state(self,ego_state: EgoState,reference_path_provider: ReferenceLineProvider):
+        s_set, l_set, s_dot_set, l_dot_set, dl_set, l_dot2_set, s_dot2_set, ddl_set= cartesian2frenet([ego_state.center.x],[ego_state.center.y],[ego_state.dynamic_car_state.rear_axle_velocity_2d.x],[ego_state.dynamic_car_state.rear_axle_velocity_2d.y],[ego_state.dynamic_car_state.rear_axle_acceleration_2d.x],[ego_state.dynamic_car_state.rear_axle_acceleration_2d.y],reference_path_provider._x_of_reference_line,reference_path_provider._y_of_reference_line,reference_path_provider._heading_of_reference_line,reference_path_provider._kappa_of_reference_line,reference_path_provider._s_of_reference_line)
+                
+        
+        return s_set[0],l_set[0],s_dot_set[0],l_dot_set[0],dl_set[0],l_dot2_set[0],s_dot2_set[0],ddl_set[0]
+    
+    def generate_convex_space(self,reference_path_provider: ReferenceLineProvider):
+        l_max = []
+        l_min = []
+        for i in range(len(reference_path_provider._s_of_reference_line)):
+            l_max.append(reference_path_provider._l_of_reference_line[i]+0.5)
+            l_min.append(reference_path_provider._l_of_reference_line[i]-0.5)
+        return l_max,l_min
+    
+    def path_planning_QP(self,start_s, start_l, start_s_dot, start_l_dot, start_dl, start_l_dot2, start_s_dot2, start_ddl, l_min, l_max):
+        qp_path_s = []
+        qp_path_l = []
+        qp_path_dl = []
+        qp_path_ddl = []
+        return qp_path_s, qp_path_l, qp_path_dl, qp_path_ddl

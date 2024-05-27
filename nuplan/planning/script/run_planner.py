@@ -38,8 +38,8 @@ DATASET_PARAMS = [
     # "scenario_filter.log_names=['2021.06.23.15.56.12_veh-16_00839_01285']", # changing_lane
     # "scenario_filter.scenario_tokens=['6d1811320c635e82']",
 
-    # "scenario_filter.log_names=['2021.07.09.20.59.12_veh-38_01208_01692']",  # near_multiple_vehicles
-    # "scenario_filter.scenario_tokens=['4f3cac1a0bcb5b89']",
+    "scenario_filter.log_names=['2021.07.09.20.59.12_veh-38_01208_01692']",  # near_multiple_vehicles
+    "scenario_filter.scenario_tokens=['4f3cac1a0bcb5b89']",
 
     # "scenario_filter.log_names=['2021.08.17.18.54.02_veh-45_00665_01065']",  # following_lane_without_lead
     # "scenario_filter.scenario_tokens=['d5eddf5327a55d5c']",
@@ -53,8 +53,8 @@ DATASET_PARAMS = [
     # "scenario_filter.log_names=['2021.05.12.22.28.35_veh-35_00620_01164']",  # following_lane_with_slow_lead
     # "scenario_filter.scenario_tokens=['1971267bb0135ef5']",
 
-    "scenario_filter.log_names=['2021.06.07.12.54.00_veh-35_01843_02314']", # following_lane_with_slow_lead
-    "scenario_filter.scenario_tokens=['4f612f81037e5cf7']",
+    # "scenario_filter.log_names=['2021.06.07.12.54.00_veh-35_01843_02314']", # following_lane_with_slow_lead
+    # "scenario_filter.scenario_tokens=['4f612f81037e5cf7']",
 
     # "scenario_filter.log_names=['2021.08.17.18.54.02_veh-45_00665_01065']",  # starting_unprotected_cross_turn
     # "scenario_filter.scenario_tokens=['7ff1de6b23035dc8']",
@@ -110,8 +110,8 @@ cfg = hydra.compose(config_name=simulation_hydra_paths.config_name, overrides=[
 from nuplan.planning.script.run_simulation import run_simulation as main_simulation
 
 # planner = SimplePlanner(horizon_seconds=10.0, sampling_time=0.25, acceleration=[0.0, 0.0])
-planner = IDMPlanner(target_velocity=10.0, min_gap_to_lead_agent=1.0, headway_time=1.5, accel_max=1.0, decel_max=3.0, planned_trajectory_samples=16, planned_trajectory_sample_interval=0.5, occupancy_map_radius=40)
-#planner = MyPlanner(horizon_seconds=8.0, sampling_time=0.25, max_velocity=17)
+# planner = IDMPlanner(target_velocity=10.0, min_gap_to_lead_agent=1.0, headway_time=1.5, accel_max=1.0, decel_max=3.0, planned_trajectory_samples=16, planned_trajectory_sample_interval=0.5, occupancy_map_radius=40)
+planner = MyPlanner(horizon_seconds=8.0, sampling_time=0.25, max_velocity=17)
 
 # Run the simulation loop (real-time visualization not yet supported, see next section for visualization)
 main_simulation(cfg, planner)
