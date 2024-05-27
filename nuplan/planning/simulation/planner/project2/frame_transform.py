@@ -104,9 +104,29 @@ def cal_proj_s(
     return s
 
     
+def cartesian2frenet_by_point(
+    x: float,
+    y: float,
+    frenet_path_x: List[float],
+    frenet_path_y: List[float],
+    frenet_path_heading: List[float],
+    frenet_path_kappa: List[float],
+    frenet_path_s: List[float]) -> Tuple[float, float]:    
+    
 
+    s_set = []
+    l_set = []
+    match_point_index_set = get_match_point([x], [y], frenet_path_x, frenet_path_y)
+    # 计算待转换点的project point
+    proj_x, proj_y, proj_heading_set, proj_kappa_set, proj_s_set = cal_project_point(\
+        [x], [y], match_point_index_set, frenet_path_x, frenet_path_y, frenet_path_heading, frenet_path_kappa, frenet_path_s)
+    s = proj_s_set[0]
+    n_r = np.array([-math.sin(proj_heading_set[0]), math.cos(proj_heading_set[0])])
+    r_h = np.array([x, y])
+    r_r = np.array([proj_x[0], proj_y[0]])
+    l = np.dot((r_h - r_r), n_r)
 
-
+    return s, l        
 
 def cartesian2frenet(
     x_set: List[float],
